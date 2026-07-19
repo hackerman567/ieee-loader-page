@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Srishti 2K25 - Stark Shield Cinematic</title>
+
+    <!-- High-End Cinematic Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@600;700;900&family=Oswald:wght@400;500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- GSAP for Master Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Three.js for cosmic background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Real Avengers Audio -->
+    <audio id="avengers-audio" src="music/avengers.mpeg.wav" preload="auto"></audio>
+
+    <style>
+        :root {
+            --marvel-red: #e23636;
+            --endgame-gold: #ffb700;
+            --space-black: #020305;
+            --hud-blue: #00e5ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--space-black);
+            overflow: hidden;
+            color: #fff;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        /* ================ PHASE 1: MARVEL FLIP ================ */
+        #marvel-intro {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--marvel-red);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            display: none;
+        }
+
+        .marvel-logo-text {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(8rem, 28vw, 25rem);
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: -5px;
+            color: #fff;
+            background-image: url('assets/image.png');
+            background-size: cover;
+            background-position: center;
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: comic-flip 3s steps(1) infinite;
+            transform: scale(2);
+        }
+
+        @keyframes comic-flip {
+            0%   { background-image: url('assets/image.png'); }
+            15%  { background-image: url('assets/image copy.png'); }
+            30%  { background-image: url('assets/image copy 2.png'); }
+            45%  { background-image: url('assets/image copy 3.png'); }
+            60%  { background-image: url('assets/image.png'); }
+            75%  { background-image: url('assets/image copy 2.png'); }
+            90%  { background-image: url('assets/image copy.png'); }
+            100% { background-image: url('assets/image copy 3.png'); }
+        }
+
+        .marvel-box {
+            position: absolute;
+            background: var(--marvel-red);
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+            height: 150px;
+            opacity: 0;
+            z-index: 101;
+            transform: scale(0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .marvel-box-text {
+            font-family: 'Anton', sans-serif;
+            font-size: 100px;
+            color: #fff;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        /* ================ PHASE 2: ULTRA CINEMATIC REVEAL ================ */
+        #cinematic-reveal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        /* ---- COSMIC WEBGL CANVAS ---- */
+        #cosmic-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* ---- FILM GRAIN OVERLAY ---- */
+        #film-grain {
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            animation: grain-shift 0.1s steps(1) infinite;
+        }
+        @keyframes grain-shift {
+            0%   { transform: translate(0,0); }
+            10%  { transform: translate(-2%,-2%); }
+            20%  { transform: translate(2%,2%); }
+            30%  { transform: translate(-1%,1%); }
+            40%  { transform: translate(1%,-1%); }
+            50%  { transform: translate(-2%,1%); }
+            60%  { transform: translate(2%,-2%); }
+            70%  { transform: translate(-1%,-1%); }
+            80%  { transform: translate(1%,2%); }
+            90%  { transform: translate(-2%,2%); }
+            100% { transform: translate(2%,1%); }
+        }
+
+        /* ---- VIGNETTE + CHROMATIC ABERRATION ---- */
+        #vignette {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center,
+                transparent 40%,
+                rgba(0,0,0,0.4) 70%,
+                rgba(0,0,0,0.85) 100%);
+        }
+
+        /* ---- MAIN STAGE (parallax container) ---- */
+        #stage {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+        }
+
+        /* ---- JARVIS HUD RINGS (SVG) ---- */
+        #jarvis-hud {
+            position: absolute;
+            width: min(90vw, 700px);
+            height: min(90vw, 700px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+        }
+
+        .hud-ring { fill: none; }
+        @keyframes hud-cw  { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+        @keyframes hud-ccw { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
+
+        /* ---- LOGO CORE ---- */
+        #logo-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -52%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            opacity: 0;
+        }
+
+        /* Logo frame with animated gradient border */
+        .logo-frame {
+            position: relative;
+            padding: 2px;
+            border-radius: 12px;
+            background: linear-gradient(135deg,
+                rgba(0,229,255,0.8) 0%,
+                rgba(229,169,61,0.6) 30%,
+                rgba(0,229,255,0.2) 60%,
+                rgba(229,169,61,0.8) 100%);
+            background-size: 300% 300%;
+            animation: border-flow 3s ease infinite;
+            box-shadow:
+                0 0 40px rgba(0,229,255,0.3),
+                0 0 80px rgba(0,229,255,0.1),
+                inset 0 0 40px rgba(0,229,255,0.05);
+        }
+        @keyframes border-flow {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo-inner {
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0,5,15,0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        /* Scanline sweep across the logo */
+        .logo-inner::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: 0;
+            width: 100%; height: 40%;
+            background: linear-gradient(transparent, rgba(0,229,255,0.06), transparent);
+            animation: scan-sweep 4s linear infinite;
+        }
+        @keyframes scan-sweep {
+            0%   { top: -40%; }
+            100% { top: 120%; }
+        }
+
+        #srishtiLogo {
+            display: block;
+            max-width: min(60vw, 500px);
+            height: auto;
+            filter: invert(1) sepia(1) hue-rotate(160deg) saturate(4) brightness(1.8) contrast(1.4)
+                    drop-shadow(0 0 15px rgba(0,229,255,0.9))
+                    drop-shadow(0 0 40px rgba(0,229,255,0.4));
+            mix-blend-mode: screen;
+            transition: filter 0.5s;
+        }
+
+        /* Chromatic abberation flicker on logo */
+        @keyframes logo-chroma {
+            0%, 90%, 100% { filter: invert(1) sepia(1) hue-rotate(160deg) saturate(4) brightness(1.8) contrast(1.4) drop-shadow(0 0 15px rgba(0,229,255,0.9)) drop-shadow(0 0 40px rgba(0,229,255,0.4)); }
+            92% { filter: invert(1) sepia(1) hue-rotate(145deg) saturate(4) brightness(2) contrast(1.4) drop-shadow(-3px 0 8px rgba(255,0,80,0.6)) drop-shadow(3px 0 8px rgba(0,229,255,0.6)); }
+        }
+        #srishtiLogo { animation: logo-chroma 8s ease infinite; }
+
+        /* ---- STAT CARDS ---- */
+        #stat-cards {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3vw;
+            opacity: 0;
+            width: 90vw;
+        }
+
+        .stat-card {
+            position: relative;
+            padding: 20px 30px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 160px;
+            background: rgba(0, 10, 20, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,229,255,0.15);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 20px 60px rgba(0,229,255,0.2);
+        }
+
+        /* Animated corner accents */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 20px; height: 20px;
+            border-top: 2px solid rgba(0,229,255,0.8);
+            border-left: 2px solid rgba(0,229,255,0.8);
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 20px; height: 20px;
+            border-bottom: 2px solid rgba(229,169,61,0.8);
+            border-right: 2px solid rgba(229,169,61,0.8);
+        }
+
+        /* Animated top line sweep */
+        .card-sweep {
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0,229,255,0.8), transparent);
+            animation: card-line 3s ease-in-out infinite;
+        }
+        .stat-card:nth-child(2) .card-sweep { animation-delay: 1.5s; }
+        @keyframes card-line {
+            0%   { left: -100%; }
+            50%  { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            color: #fff;
+            text-shadow:
+                0 0 10px rgba(0,229,255,0.8),
+                0 0 30px rgba(0,229,255,0.4);
+            line-height: 1;
+            letter-spacing: 2px;
+        }
+
+        .stat-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(0,229,255,0.7);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        /* Radar sweep inside card */
+        .card-radar {
+            position: absolute;
+            bottom: 8px; right: 8px;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,229,255,0.2);
+            overflow: hidden;
+        }
+        .card-radar::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 50%; height: 2px;
+            background: rgba(0,229,255,0.8);
+            transform-origin: left center;
+            animation: radar-sweep 2s linear infinite;
+        }
+        @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ---- HERO / ENTRY PAGE ---- */
+        #hero-page {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            cursor: pointer;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('assets/image.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            filter: blur(12px) grayscale(40%);
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 20;
+            background: rgba(0,0,0,0.35);
+            padding: 3rem 5rem;
+            border: 1px solid rgba(0,229,255,0.25);
+            backdrop-filter: blur(15px);
+            border-radius: 10px;
+            box-shadow: 0 0 80px rgba(0,229,255,0.08);
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: #fff;
+            letter-spacing: 15px;
+            text-transform: uppercase;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.9);
+        }
+
+        .hero-subtitle {
+            color: var(--endgame-gold);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 8px;
+            margin-top: 10px;
+        }
+
+        .click-to-enter {
+            margin-top: 40px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: rgba(0, 229, 255, 0.8);
+            text-transform: uppercase;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; text-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
+            50% { opacity: 1; text-shadow: 0 0 20px rgba(0, 229, 255, 0.8); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero / Entry Page -->
+    <div id="hero-page">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">The Infinity</h1>
+            <div class="hero-subtitle">GAME BEGINS</div>
+            <div class="click-to-enter">[ CLICK TO ENTER ]</div>
+        </div>
+    </div>
+
+    <!-- Phase 1: Marvel Flip Intro -->
+    <div id="marvel-intro">
+        <h1 class="marvel-logo-text" id="marvelText">PSG TECH</h1>
+        <div class="marvel-box" id="marvelBox">
+            <span class="marvel-box-text">PSG TECH</span>
+        </div>
+    </div>
+
+    <!-- Phase 2: Ultra Cinematic Reveal -->
+    <div id="cinematic-reveal">
+        <!-- Three.js Cosmic Background -->
+        <canvas id="cosmic-canvas"></canvas>
+        <!-- Film Grain -->
+        <div id="film-grain"></div>
+        <!-- Vignette -->
+        <div id="vignette"></div>
+
+        <!-- Parallax Stage -->
+        <div id="stage">
+            <!-- JARVIS HUD SVG Rings -->
+            <svg id="jarvis-hud" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ring 1: outer slow CW gold -->
+                <circle class="hud-ring" cx="350" cy="350" r="320"
+                    stroke="rgba(229,169,61,0.25)" stroke-width="1"
+                    stroke-dasharray="60 20 10 30 80 15 40"
+                    style="transform-origin:350px 350px; animation:hud-cw 20s linear infinite"/>
+                <!-- Ring 2: outer accent -->
+                <circle class="hud-ring" cx="350" cy="350" r="300"
+                    stroke="rgba(0,229,255,0.2)" stroke-width="1.5"
+                    stroke-dasharray="120 30 5 60"
+                    style="transform-origin:350px 350px; animation:hud-ccw 15s linear infinite"/>
+                <!-- Ring 3: scanner blue -->
+                <circle class="hud-ring" cx="350" cy="350" r="270"
+                    stroke="rgba(0,150,255,0.35)" stroke-width="2"
+                    stroke-dasharray="200 50 10 80"
+                    style="transform-origin:350px 350px; animation:hud-cw 10s linear infinite"/>
+                <!-- Radar sweep arc -->
+                <path id="radar-arc" d="M350,350 L350,100" stroke="rgba(0,229,255,0.6)" stroke-width="1.5"
+                    style="transform-origin:350px 350px; animation:hud-cw 4s linear infinite;
+                    filter:drop-shadow(0 0 4px rgba(0,229,255,0.8))"/>
+                <path d="M350,80 A270,270 0 0,1 605,490" fill="rgba(0,229,255,0.03)"
+                    stroke="none"
+                    style="transform-origin:350px 350px; animation:hud-cw 4s linear infinite"/>
+                <!-- Ring 4: inner crimson -->
+                <circle class="hud-ring" cx="350" cy="350" r="230"
+                    stroke="rgba(226,54,54,0.2)" stroke-width="1.5"
+                    stroke-dasharray="30 10 60 20"
+                    style="transform-origin:350px 350px; animation:hud-ccw 8s linear infinite"/>
+                <!-- Ring 5: innermost pulse -->
+                <circle class="hud-ring" cx="350" cy="350" r="200"
+                    stroke="rgba(0,229,255,0.15)" stroke-width="1"
+                    stroke-dasharray="15 5"
+                    style="transform-origin:350px 350px; animation:hud-cw 5s linear infinite"/>
+                <!-- Cross-hair lines -->
+                <line x1="30" y1="350" x2="150" y2="350" stroke="rgba(0,229,255,0.25)" stroke-width="1"/>
+                <line x1="550" y1="350" x2="670" y2="350" stroke="rgba(0,229,255,0.25)" stroke-width="1"/>
+                <line x1="350" y1="30" x2="350" y2="150" stroke="rgba(229,169,61,0.25)" stroke-width="1"/>
+                <line x1="350" y1="550" x2="350" y2="670" stroke="rgba(229,169,61,0.25)" stroke-width="1"/>
+                <!-- Data nodes -->
+                <circle cx="350" cy="80" r="4" fill="rgba(0,229,255,0.6)" style="filter:drop-shadow(0 0 6px #00e5ff)"/>
+                <circle cx="620" cy="350" r="3" fill="rgba(229,169,61,0.6)" style="filter:drop-shadow(0 0 6px #e5a93d)"/>
+                <circle cx="350" cy="620" r="4" fill="rgba(0,229,255,0.6)" style="filter:drop-shadow(0 0 6px #00e5ff)"/>
+                <circle cx="80" cy="350" r="3" fill="rgba(229,169,61,0.6)" style="filter:drop-shadow(0 0 6px #e5a93d)"/>
+                <!-- Diagonal tickmarks -->
+                <circle cx="597" cy="155" r="2.5" fill="rgba(0,229,255,0.4)"/>
+                <circle cx="597" cy="545" r="2.5" fill="rgba(226,54,54,0.5)"/>
+                <circle cx="103" cy="155" r="2.5" fill="rgba(0,229,255,0.4)"/>
+                <circle cx="103" cy="545" r="2.5" fill="rgba(226,54,54,0.5)"/>
+            </svg>
+
+            <!-- Logo Core -->
+            <div id="logo-core">
+                <div class="logo-frame">
+                    <div class="logo-inner">
+                        <img src="assets/logo.png" id="srishtiLogo" alt="Srishti 2K25" onerror="this.style.display='none'">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat Cards -->
+            <div id="stat-cards">
+                <div class="stat-card">
+                    <div class="card-sweep"></div>
+                    <div class="card-radar"></div>
+                    <div class="stat-value" id="val1">0+</div>
+                    <div class="stat-label">Premium Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="card-sweep"></div>
+                    <div class="card-radar"></div>
+                    <div class="stat-value">&#x20B9;<span id="val2">0</span></div>
+                    <div class="stat-label">Total Bounty</div>
+                </div>
+            </div>
+        </div><!-- /stage -->
+    </div><!-- /cinematic-reveal -->
+
+    <script>
+        /* ================================================================
+           THREE.JS COSMIC BACKGROUND (Vast Universe)
+        ================================================================ */
+        (function initCosmos() {
+            const cosmosCanvas = document.getElementById('cosmic-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: cosmosCanvas, antialias: false, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000305, 1);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 600;
+
+            // ---- Starfield ----
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 4000;
+            const starPos = new Float32Array(starCount * 3);
+            const starSize = new Float32Array(starCount);
+            for (let i = 0; i < starCount; i++) {
+                starPos[i*3]   = (Math.random() - 0.5) * 2000;
+                starPos[i*3+1] = (Math.random() - 0.5) * 2000;
+                starPos[i*3+2] = (Math.random() - 0.5) * 1500;
+                starSize[i] = Math.random() * 2.5 + 0.3;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            starGeo.setAttribute('size', new THREE.BufferAttribute(starSize, 1));
+            const starMat = new THREE.ShaderMaterial({
+                vertexShader: `
+                    attribute float size;
+                    varying float vAlpha;
+                    void main() {
+                        vAlpha = 0.5 + 0.5 * sin(position.x * 0.01 + position.y * 0.01);
+                        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+                        gl_PointSize = size * (500.0 / -mv.z);
+                        gl_Position = projectionMatrix * mv;
+                    }
+                `,
+                fragmentShader: `
+                    varying float vAlpha;
+                    void main() {
+                        float d = distance(gl_PointCoord, vec2(0.5));
+                        if (d > 0.5) discard;
+                        float glow = 1.0 - d * 2.0;
+                        gl_FragColor = vec4(0.7 + 0.3 * vAlpha, 0.85 + 0.15 * vAlpha, 1.0, glow * vAlpha);
+                    }
+                `,
+                transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+            });
+            scene.add(new THREE.Points(starGeo, starMat));
+
+            // ---- Nebula Fog Particles ----
+            const nebGeo = new THREE.BufferGeometry();
+            const nebCount = 1200;
+            const nebPos = new Float32Array(nebCount * 3);
+            const nebCol = new Float32Array(nebCount * 3);
+            for (let i = 0; i < nebCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 200 + Math.random() * 500;
+                nebPos[i*3]   = Math.cos(angle) * radius;
+                nebPos[i*3+1] = (Math.random() - 0.5) * 400;
+                nebPos[i*3+2] = Math.sin(angle) * radius - 200;
+                const t = Math.random();
+                nebCol[i*3]   = t * 0.1;
+                nebCol[i*3+1] = 0.1 + t * 0.4;
+                nebCol[i*3+2] = 0.3 + t * 0.7;
+            }
+            nebGeo.setAttribute('position', new THREE.BufferAttribute(nebPos, 3));
+            nebGeo.setAttribute('color', new THREE.BufferAttribute(nebCol, 3));
+            const nebMat = new THREE.PointsMaterial({
+                size: 12, vertexColors: true, transparent: true,
+                opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false
+            });
+            scene.add(new THREE.Points(nebGeo, nebMat));
+
+            // ---- Gold Ember Particles ----
+            const embGeo = new THREE.BufferGeometry();
+            const embCount = 600;
+            const embPos = new Float32Array(embCount * 3);
+            const embVel = new Float32Array(embCount * 3);
+            for (let i = 0; i < embCount; i++) {
+                embPos[i*3]   = (Math.random() - 0.5) * 1200;
+                embPos[i*3+1] = -300 + Math.random() * 100;
+                embPos[i*3+2] = (Math.random() - 0.5) * 800;
+                embVel[i*3]   = (Math.random() - 0.5) * 0.3;
+                embVel[i*3+1] = 0.2 + Math.random() * 0.8;
+                embVel[i*3+2] = (Math.random() - 0.5) * 0.2;
+            }
+            embGeo.setAttribute('position', new THREE.BufferAttribute(embPos, 3));
+            const embMat = new THREE.PointsMaterial({
+                size: 3, color: 0xffb700, transparent: true,
+                opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false
+            });
+            const embers = new THREE.Points(embGeo, embMat);
+            scene.add(embers);
+
+            // Mouse tracking for parallax
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', e => {
+                mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const embPositions = embGeo.attributes.position.array;
+            let cosmosTime = 0;
+
+            function renderCosmos() {
+                requestAnimationFrame(renderCosmos);
+                cosmosTime += 0.003;
+
+                // Slow camera orbit
+                camera.position.x += (mouseX * 30 - camera.position.x) * 0.02;
+                camera.position.y += (-mouseY * 20 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+
+                // Animate embers rising
+                for (let i = 0; i < embCount; i++) {
+                    embPositions[i*3+1] += embVel[i*3+1] * 0.4;
+                    embPositions[i*3]   += Math.sin(cosmosTime + i) * 0.05;
+                    if (embPositions[i*3+1] > 400) {
+                        embPositions[i*3+1] = -300;
+                        embPositions[i*3]   = (Math.random() - 0.5) * 1200;
+                    }
+                }
+                embGeo.attributes.position.needsUpdate = true;
+
+                // Gentle nebula rotation
+                scene.children[1].rotation.y = cosmosTime * 0.03;
+
+                renderer.render(scene, camera);
+            }
+            renderCosmos();
+        })();
+
+        /* ================================================================
+           MOUSE PARALLAX ON STAGE (Logo + HUD + Cards)
+        ================================================================ */
+        const stage = document.getElementById('stage');
+        document.addEventListener('mousemove', e => {
+            const x = (e.clientX / window.innerWidth  - 0.5) * 18;
+            const y = (e.clientY / window.innerHeight - 0.5) * 12;
+            stage.style.transform = `translate(${x}px, ${y}px)`;
+        });
+
+        /* ================================================================
+           ENTRY CLICK HANDLER & MUSIC AUTOPLAY
+        ================================================================ */
+        const heroPage    = document.getElementById('hero-page');
+        const marvelIntro = document.getElementById('marvel-intro');
+        const audio       = document.getElementById('avengers-audio');
+        
+        audio.volume = 0.9;
+
+        heroPage.addEventListener('click', () => {
+            // Play audio (allowed because user clicked)
+            audio.play().catch(() => {});
+            
+            // Fade out hero page and start cinematic
+            gsap.to(heroPage, {
+                opacity: 0, 
+                duration: 0.5, 
+                onComplete: () => {
+                    heroPage.style.display = 'none';
+                    marvelIntro.style.display = 'flex';
+                    startCinematic();
+                }
+            });
+        }, { once: true });
+
+        /* ================================================================
+           GSAP MASTER TIMELINE
+        ================================================================ */
+        function startCinematic() {
+            const tl = gsap.timeline();
+
+            // === PHASE 1: MARVEL COMIC FLIP (0s - 3.5s) ===
+            tl.fromTo('#marvelText', { scale: 2.5 }, { scale: 1, duration: 3.5, ease: "power2.inOut" }, 0)
+            .to('#marvelText', { opacity: 0, duration: 0.1 }, 3.0)
+            .to('#marvelBox', { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 3.0)
+            .to('#marvel-intro', { opacity: 0, duration: 0.5, ease: "power2.in" }, 3.5)
+            .set('#marvel-intro', { display: 'none' })
+
+            // === PHASE 2: COSMIC REVEAL (4.0s) ===
+            .to('#cinematic-reveal', { opacity: 1, duration: 0.8, ease: "power2.out" }, 4.0)
+
+            // HUD rings materialize
+            .to('#jarvis-hud', {
+                opacity: 1, duration: 2, ease: "power3.out",
+                filter: "drop-shadow(0 0 8px rgba(0,229,255,0.4))"
+            }, 4.2)
+
+            // Logo slams in from deep space
+            .fromTo('#logo-core', {
+                opacity: 0, scale: 0.3,
+                filter: "brightness(5) blur(20px)"
+            }, {
+                opacity: 1, scale: 1,
+                filter: "brightness(1) blur(0px)",
+                duration: 1.8, ease: "expo.out"
+            }, 5.0)
+
+            // Screen shake on logo impact
+            .to('#cinematic-reveal', {
+                x: -8, duration: 0.05, ease: "none", yoyo: true, repeat: 9
+            }, 5.05)
+
+            // JARVIS hologram flicker
+            .to('#srishtiLogo', { opacity: 0.3, duration: 0.08 }, 6.0)
+            .to('#srishtiLogo', { opacity: 1,   duration: 0.08 }, 6.1)
+            .to('#srishtiLogo', { opacity: 0.5, duration: 0.08 }, 6.2)
+            .to('#srishtiLogo', { opacity: 1,   duration: 0.3,  ease: "power2.out" }, 6.3)
+
+            // === STAT CARDS (7.0s) ===
+            .fromTo('#stat-cards', { opacity: 0, y: 40 }, {
+                opacity: 1, y: 0, duration: 1.2, ease: "expo.out"
+            }, 7.0)
+
+            .to({ val: 0 }, {
+                val: 30, duration: 2, ease: "power2.out",
+                onUpdate: function () {
+                    document.getElementById('val1').innerText = Math.floor(this.targets()[0].val) + "+";
+                }
+            }, 7.5)
+            .to({ val: 0 }, {
+                val: 100000, duration: 2, ease: "power2.out",
+                onUpdate: function () {
+                    document.getElementById('val2').innerText = Math.floor(this.targets()[0].val).toLocaleString();
+                }
+            }, 7.5);
+            // End on Phase 2
+        }
+    </script>
+</body>
+</html>
